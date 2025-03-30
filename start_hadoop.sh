@@ -20,7 +20,6 @@ docker run --hostname=quickstart.cloudera --privileged=true -d -it \
 -p 16000:16000 \
 -p 19888:19888 \
 -p 50030:50030 \
--p 50070:50070 \
 -p 50075:50075 \
 -p 60010:60010 \
 -p 60030:60030 \
