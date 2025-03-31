@@ -47,9 +47,9 @@ public class CORPairs extends Configured implements Tool {
 	 */
 	private static class CORMapper1 extends
 			Mapper<LongWritable, Text, Text, IntWritable> {
-		@Override
 		//
 		private static final IntWritable ONE = new IntWritable(1);
+		@Override
 		public void map(LongWritable key, Text value, Context context)
 				throws IOException, InterruptedException {
 			HashMap<String, Integer> word_set = new HashMap<String, Integer>();
