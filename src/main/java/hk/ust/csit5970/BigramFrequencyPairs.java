@@ -28,6 +28,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 import org.apache.log4j.Logger;
 
+//
+import java.util.Iterator;
+
 /**
  * Compute the bigram count using "pairs" approach
  */
@@ -53,6 +56,20 @@ public class BigramFrequencyPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+            if (words.length > 1){
+ 				String prev = words[0];
+ 				for (int i = 1; i < words.length; i++) {
+ 					String w = words[i];
+ 					if (w.length() == 0) {
+ 						continue;
+ 					}
+ 					BIGRAM.set(prev, w);
+ 					context.write(BIGRAM, ONE);
+ 					BIGRAM.set(prev, "");
+ 					context.write(BIGRAM, ONE);
+ 					prev = w;
+ 				}
+ 			}
 		}
 	}
 
@@ -64,6 +81,8 @@ public class BigramFrequencyPairs extends Configured implements Tool {
 
 		// Reuse objects.
 		private final static FloatWritable VALUE = new FloatWritable();
+		//原来没有
+		private static final FloatWritable SUM = new FloatWritable();
 
 		@Override
 		public void reduce(PairOfStrings key, Iterable<IntWritable> values,
@@ -71,6 +90,27 @@ public class BigramFrequencyPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			String leftWord = key.getLeftElement();
+			String rightWord = key.getRightElement();
+
+            if (rightWord.isEmpty()) {
+ 				Iterator<IntWritable> iter = values.iterator();
+ 				float sum = 0;
+ 				while (iter.hasNext()) {
+ 					sum += iter.next().get();
+ 				}
+ 				SUM.set(sum);
+ 				context.write(key, SUM);
+ 			}
+ 			else {
+ 				Iterator<IntWritable> iter = values.iterator();
+ 				float sum = 0;
+ 				while (iter.hasNext()) {
+ 					sum += iter.next().get();
+ 				}
+ 				VALUE.set(sum / SUM.get());
+ 				context.write(key, VALUE);
+ 			}
 		}
 	}
 	
@@ -84,6 +124,10 @@ public class BigramFrequencyPairs extends Configured implements Tool {
 			/*
 			 * TODO: Your implementation goes here.
 			 */
+			Iterator<IntWritable> iter = values.iterator();
+ 			while (iter.hasNext()) {
+ 				context.write(key, iter.next());
+ 			}
 		}
 	}
 
